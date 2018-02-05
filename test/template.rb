@@ -3,7 +3,7 @@ copy_file "test/support/circleci.rb"
 copy_file "test/support/mailer.rb"
 copy_file "test/support/mocha.rb"
 copy_file "test/support/rails.rb"
-copy_file "test/support/sidekiq.rb"
+copy_file "test/support/sidekiq.rb" if apply_sidekiq?
 copy_file "test/support/shoulda_matchers.rb"
 copy_file "test/helpers/javascript_helper_test.rb"
 copy_file "test/helpers/retina_image_helper_test.rb"

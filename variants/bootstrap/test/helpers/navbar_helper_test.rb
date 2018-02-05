@@ -38,7 +38,7 @@ class NavbarHelperTest < ActionView::TestCase
 
   test "#navbar_link_to otherwise doesn't add active class" do
     stubs(:params).returns(:controller => "users")
-    tag = navbar_link_to("Home", "/", :active_when => { :controller => "home" })
-    assert_equal('<li><a href="/">Home</a></li>', tag)
+    tag = navbar_link_to("Welcome", "/", :active_when => { :controller => "web/welcome" })
+    assert_equal('<li><a href="/">Welcome</a></li>', tag)
   end
 end

@@ -1,19 +1,20 @@
 set :application, "<%= app_name %>"
 set :repo_url, "<%= git_repo_specified? ? git_repo_url : "TODO" %>"
 
+set :keep_releases, 5
+
 # Project-specific overrides go here.
 # For list of variables that can be customized, see:
 # https://github.com/mattbrictson/capistrano-mb/blob/master/lib/capistrano/tasks/defaults.rake
 
-fetch(:mb_recipes) << "sidekiq"
-fetch(:mb_aptitude_packages)["redis-server@ppa:chris-lea/redis-server"] = :redis
+set :linked_dirs, %w{log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system public/uploads}
+set :linked_files, %w{config/database.yml config/secrets.yml public/robots.txt}
 
-set :mb_dotenv_keys, %w(
-  rails_secret_key_base
-  postmark_api_key
-  redis_url
-  sidekiq_web_username
-  sidekiq_web_password
-)
+<% if apply_rollbar? -%>
+set :rollbar_token, ENV['ROLLBAR_TOKEN']
+set :rollbar_env, -> { fetch :stage }
+set :rollbar_role, -> { :web }
+<% end -%>
 
 after "deploy:published", "bundler:clean"
+

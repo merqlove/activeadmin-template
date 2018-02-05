@@ -1,4 +1,17 @@
 ---
+:verbose: true
+:pidfile: ./tmp/pids/sidekiq.pid
+:concurrency: <%= ENV['SIDEKIQ_CONCURRENCY'] || 5 %>
+#development:
+#  :concurrency: <%= ENV['MAX_THREADS'] || 10 %>
+#  :logfile: ./log/sidekiq.development.log
+production:
+  :concurrency: <%= ENV['SIDEKIQ_CONCURRENCY'] || 10 %>
+  :logfile: ./log/sidekiq.production.log
+:timeout: 30
 :queues:
-  - default
-  - mailers
+  - [default, 1]
+  - [critical, 3]
+  - [rollbar, 1]
+  - [low, 1]
+  - [uploader, 2]

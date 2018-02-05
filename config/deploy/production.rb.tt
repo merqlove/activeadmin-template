@@ -1,6 +1,12 @@
-set :branch, ENV.fetch("CAPISTRANO_BRANCH", "master")
-set :mb_sidekiq_concurrency, 1
+require 'fileutils'
 
 server "<%= production_hostname %>",
-       :user => "deployer",
+       :user => "deploy",
        :roles => %w(app backup cron db redis sidekiq web)
+
+set :branch do
+  v = File.readlines('../../VERSION').to_a
+  version = ENV.fetch("TAG", v[0])
+  raise "Use tags: TAG=v1.0" unless version
+  version
+end

@@ -1,0 +1,3 @@
+class BaseAudioUploader < BaseUploader
+
+end

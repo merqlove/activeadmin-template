@@ -1,0 +1,16 @@
+# Be sure to restart your server when you modify this file.
+
+Rails.application.config.session_store :redis_store, {
+  servers: [
+    {
+      host: ENV['REDIS_HOST'],
+      port: ENV['REDIS_PORT'],
+      db: 0,
+      use_ssl: (ENV['REDIS_SSL'] == 'true' ? true : false),
+      password: ENV['REDIS_KEY'],
+      pool_size: ENV['POOL']
+    }
+  ],
+  key: '_<%= app_name %>_session',
+  expires_in: 1.day#, :domain => :all
+}

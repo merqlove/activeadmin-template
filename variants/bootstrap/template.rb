@@ -15,4 +15,5 @@ copy_file "lib/templates/erb/scaffold/edit.html.erb"
 copy_file "lib/templates/erb/scaffold/index.html.erb"
 copy_file "lib/templates/erb/scaffold/new.html.erb"
 copy_file "lib/templates/erb/scaffold/show.html.erb"
-copy_file "test/helpers/navbar_helper_test.rb"
+copy_file "test/helpers/navbar_helper_test.rb" if apply_minitest?
+copy_file "spec/helpers/navbar_helper_spec.rb" unless apply_minitest?

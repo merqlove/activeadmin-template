@@ -11,9 +11,9 @@
     </div>
     <div class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
-        <%%= navbar_link_to("Home",
+        <%%= navbar_link_to("Welcome",
                            root_path,
-                           :active_when => { :controller => "home" }) %>
+                           :active_when => { :controller => "web/welcome" }) %>
         <li><a href="#contact">Contact</a></li>
         <li class="dropdown">
           <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <b class="caret"></b></a>

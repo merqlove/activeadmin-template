@@ -1,0 +1,23 @@
+<% if apply_minitest? -%>
+  Rails.application.config.generators do |g|
+    # Disable generators we don't need.
+    g.javascripts false
+    g.stylesheets false
+  end
+<% else %>
+  Rails.application.config.generators do |g|
+    # g.test_framework :minitest, spec: true, fixture: true
+    g.orm :active_record
+    g.test_framework :rspec, fixture: true
+    g.fixture_replacement :factory_bot
+    g.factory_bot dir: 'spec/factories'
+    g.template_engine :haml
+    g.assets false
+    g.helper = false
+
+    g.view_specs false
+    g.helper_specs false
+    g.javascripts false
+    g.stylesheets false
+  end
+<% end -%>

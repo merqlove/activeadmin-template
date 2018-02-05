@@ -1,6 +1,6 @@
-set :branch, ENV.fetch("CAPISTRANO_BRANCH", "development")
+set :branch, ENV.fetch("TAG", "development")
 set :mb_sidekiq_concurrency, 1
 
 server "<%= staging_hostname %>",
-       :user => "deployer",
+       :user => "deploy",
        :roles => %w(app backup cron db redis sidekiq web)

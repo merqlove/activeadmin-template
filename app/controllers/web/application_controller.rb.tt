@@ -1,0 +1,5 @@
+module Web
+  class ApplicationController < ::ApplicationController
+    <%= "include PunditHelper" if apply_pundit? -%>
+  end
+end

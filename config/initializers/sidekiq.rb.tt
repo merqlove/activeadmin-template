@@ -1,6 +1,21 @@
-require "sidekiq/web"
-Sidekiq::Web.app_url = "/"
-Sidekiq::Web.use(Rack::Auth::Basic, "Application") do |username, password|
-  username == ENV.fetch("SIDEKIQ_WEB_USERNAME") &&
-  password == ENV.fetch("SIDEKIQ_WEB_PASSWORD")
+<% if apply_redis? -%>
+redis_config = { :host => ENV['REDIS_HOST'],
+                 :port => ENV['REDIS_PORT'],
+                 :use_ssl => (ENV['REDIS_SSL'] == 'true' ? true : false),
+                 :password => ENV['REDIS_KEY'],
+                 :namespace => '_<%= app_name -%>.sidekiq',
+                 :pool_size => ENV['POOL'] }
+
+Sidekiq.configure_client do |config|
+  config.redis = redis_config
+end
+<% end -%>
+
+Sidekiq.configure_server do |config|
+<% if apply_redis? -%>
+  config.redis = redis_config
+<% end -%>
+<% if apply_rollbar? -%>
+  config.error_handlers << -> (ex) { Rollbar.error(ex) } if Rails.env.production?
+<% end -%>
 end

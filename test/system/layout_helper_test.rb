@@ -5,6 +5,6 @@ class LayoutHelperTest < ApplicationSystemTestCase
     visit("/")
     assert_selector("html>head+body")
     assert_selector("body p")
-    assert_match(/Home/, page.title)
+    assert_match(/Welcome/, page.title)
   end
 end

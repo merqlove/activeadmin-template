@@ -1,4 +1,4 @@
-insert_into_file "Gemfile", :after => /gem "bcrypt".*\n/ do
+insert_into_file "Gemfile", :after => /gem "bootsnap".*\n/ do
   <<-GEMS.strip_heredoc
     gem "bootstrap_form", "~> 2.3"
     gem "bootstrap-sass", "~> 3.3"
