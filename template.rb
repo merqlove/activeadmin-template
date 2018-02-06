@@ -335,7 +335,7 @@ def create_initial_migration
 end
 
 def create_initial_whenever
-  run 'bin/bundle exec wheneverize .'
+  run 'bundle exec wheneverize .'
 end
 
 def create_initial_aa
@@ -344,6 +344,7 @@ end
 
 def create_initial_devise
   run 'bundle exec spring stop'
+  run 'bin/rails generate model User login:string:index'
   run 'bin/rails generate devise:install'
   run 'bin/rails generate devise User'
 end

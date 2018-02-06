@@ -4,32 +4,31 @@ remove_file "app/assets/stylesheets/application.css"
 
 clone_user =
   <<-RUBY
-    include CloneAll
+  include CloneAll
   RUBY
 
 fid_user =
   <<-RUBY
-    extend FriendlyId
-    alias_attribute :uid, :login
+  extend FriendlyId
 
-    friendly_id do |config|
-      config.base = :login_candidates
-      config.defaults[:slug_column] = :login
-      config.use :slugged
-      config.use Module.new {
-        def normalize_friendly_id(text)
-          Russian.translit(text).parameterize
-        end
-      }
+  friendly_id do |config|
+    config.base = :login_candidates
+    config.defaults[:slug_column] = :login
+    config.use :slugged
+    config.use Module.new do
+      def normalize_friendly_id(text)
+        Russian.translit(text).parameterize
+      end
     end
+  end
 
-    def login_candidates
-      [login, profile&.full_name].join(' ')
-    end
+  def login_candidates
+    login
+  end
 
-    def should_generate_new_friendly_id?
-      login.blank?
-    end
+  def should_generate_new_friendly_id?
+    login.blank?
+  end
   RUBY
 
 if apply_devise?

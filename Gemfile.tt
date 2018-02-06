@@ -50,6 +50,9 @@ gem 'devise-i18n'
 <% end -%>
 
 gem "mail", ">= 2.6.3"
+<% if apply_mailkick? -%>
+gem 'mailkick'
+<% end -%>
 
 <% if apply_pundit? -%>
 # Authorization
@@ -261,7 +264,7 @@ group :development do
   gem "sshkit", "~> 1.8", :require => false
   # gem "terminal-notifier", :require => false
   # gem "terminal-notifier-guard", :require => false
-  gem "xray-rails", ">= 0.1.18"
+  # gem "xray-rails", ">= 0.1.18"
 end
 
 group :development, :test do

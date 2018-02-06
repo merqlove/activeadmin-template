@@ -7,7 +7,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Attack
 #   Rack::Timeout.timeout = 10 # seconds
 # end
 
-Rails.application.config.middleware.insert_after ActionDispatch::Reloader, Rack::Protection
+Rails.application.config.middleware.insert_before ActionDispatch::Flash, ::Rack::Protection
 
 Rails.application.config.middleware.insert_before 0, Rack::Cors do
   allow do

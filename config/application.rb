@@ -27,28 +27,31 @@ end
 
 mailkick =
   <<-RUBY
+  
   # Cleanup routes
-    config.initializer 'mailkick', :after => 'add_routing_paths' do |app|
-      app.routes_reloader.paths.delete_if{ |path| path.include?('mailkick') }
-    end
+  initializer 'mailkick', :after => 'add_routing_paths' do |app|
+    app.routes_reloader.paths.delete_if{ |path| path.include?('mailkick') }
+  end
   RUBY
 
 sidekiq =
   <<-RUBY
-    # Use sidekiq to process Active Jobs (e.g. ActionMailer's deliver_later)
-    config.active_job.queue_adapter = :sidekiq
+
+  # Use sidekiq to process Active Jobs (e.g. ActionMailer's deliver_later)
+  config.active_job.queue_adapter = :sidekiq
   RUBY
 
 db =
   <<-RUBY
-    config.active_record.schema_format = :sql
+
+  config.active_record.schema_format = :sql
   RUBY
 
 data[:mailkick] = mailkick if apply_mailkick?
 data[:sidekiq] = sidekiq if apply_sidekiq?
 data[:db] = db if apply_db?
 
-insert_into_file "config/application.rb", :after => /class.*/ do
+insert_into_file "config/application.rb", :after => /Rails::Application\n/ do
   <<-RUBY
     #{data[:mailkick]}
     #{data[:sidekiq]}
