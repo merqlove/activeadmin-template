@@ -1,5 +1,7 @@
-create_initial_rspec do
-  template "spec/depends.rb.rb"
+after_bundle do
+  create_initial_rspec
+
+  template "spec/depends.rb.tt"
 
   gsub_file 'spec/rails_helper.rb', /# Add additional requires below this line. Rails is not loaded until this point!/ do
     "# This has to come first
@@ -15,7 +17,7 @@ create_initial_rspec do
   copy_file "spec/support/database_cleaner.rb" if apply_db?
   copy_file "spec/support/devise.rb" if apply_devise?
   copy_file "spec/support/mailer.rb"
-  copy_file "spec/support/email_spec.rb"
+  copy_file "spec/support/email.rb"
   copy_file "spec/support/factory_bot.rb" if apply_db?
   copy_file "spec/support/features_helper.rb"
   copy_file "spec/support/job_helpers.rb"

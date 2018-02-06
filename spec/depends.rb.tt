@@ -1,5 +1,5 @@
 require 'webmock/rspec'
-<%= "require 'pundit/rspec'" if apply_pundit? -%>
+<%= "require 'pundit/rspec'" if apply_pundit? %>
 require 'ffaker'
 
 if ENV['COVERAGE']

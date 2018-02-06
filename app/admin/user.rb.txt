@@ -1,0 +1,86 @@
+ActiveAdmin.register User do
+  actions :all
+  permit_params :email, :password, :password_confirmation
+
+  config.comments = false
+
+  scope -> { 'All' }, :all, :default => true
+
+  menu priority: 1, label: proc { I18n.t('active_admin.admin_users') }, id: 'user'
+
+  controller do
+    after_action :send_credentials, only: [:create]
+
+    def find_resource
+      scoped_collection.friendly.find(params[:id])
+    rescue ActiveRecord::RecordNotFound
+      scoped_collection.find(params[:id])
+    end
+
+    def redirect_to_edit
+      @user = find_resource
+      redirect_to edit_admin_user_path(current_admin), Hash.new(flash) if current_admin?(@user)
+    end
+
+    alias_method :show, :redirect_to_edit
+
+    private
+
+    def send_credentials
+      AdminUserNoticeJob.perform_later(@user.id, permitted_params[:user][:password])
+    end
+
+    def current_admin?(user)
+      return false unless user
+      current_admin.id == user.id
+    end
+  end
+
+  filter :email
+  filter :current_sign_in_at
+  filter :sign_in_count
+  filter :created_at
+  filter :locked
+
+  show do
+    tabs do
+      tab 'Описание' do
+        attributes_table do
+          row :role do |user|
+            enum_status_tag(user, :role)
+          end
+          row :email
+          row :updated_at
+          row :last_sign_in_at
+          row :failed_attempts
+        end
+      end
+    end
+
+    active_admin_comments
+  end
+
+  index do
+    selectable_column
+    id_column
+    column :email, as: :email
+    column :updated_at
+    column :failed_attempts
+    actions
+  end
+
+  form html: { multipart: true } do |f|
+    tabs do
+      tab 'Данные' do
+        f.inputs do
+          f.input :email, as: :email
+          if f.object.new_record?
+            f.input :password
+            f.input :password_confirmation, required: true
+          end
+        end
+      end
+    end
+    f.actions
+  end
+end

@@ -1,0 +1,3 @@
+<% if apply_aa? -%>
+class AdminAccessDeniedError < SecurityError; end
+<% end -%>

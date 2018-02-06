@@ -8,7 +8,9 @@ copy_file 'config/secrets.yml', :force => true
 
 copy_file 'config/sidekiq.yml' if apply_sidekiq?
 
-create_initial_kaminari if apply_kaminari?
+after_bundle do
+  create_initial_kaminari if apply_kaminari?
+end
 
 if apply_capistrano?
   template 'config/deploy.rb.tt'
@@ -20,7 +22,7 @@ gsub_file 'config/routes.rb', /  # root 'welcome#index'/ do
   <<-RUBY
     mount LetterOpenerWeb::Engine, at: '/smtp' if Rails.env.development?
 
-    get '/robots.txt', to: proc { |_| [
+    get '/robots.txt', to: proc { |_| [                                                              
       200,
       { 'Content-Type' => 'text/plain' },
       [ "User-agent: *\\nDisallow: /" ]
@@ -37,9 +39,10 @@ gsub_file 'config/routes.rb', /  # root 'welcome#index'/ do
 end
 
 template 'config/initializers/generators.rb'
+template 'config/initializers/errors.rb'
 
 copy_file 'config/initializers/rails_settings_cached.rb' if apply_settings?
-copy_file 'config/initializers/pundit.rb' if apply_pundit?
+template 'config/initializers/pundit.rb' if apply_pundit?
 template 'config/initializers/rollbar.rb.tt' if apply_rollbar?
 copy_file 'config/initializers/profiler.rb' if apply_profiler?
 copy_file 'config/initializers/rotate_log.rb'
@@ -80,7 +83,7 @@ template 'config/environments/staging.rb.tt'
 
 if apply_devise?
   after_bundle do
-    insert_into_file 'config/initializers/devise.rb', after: /  # config.secret_key.*/ do
+    insert_into_file 'config/initializers/devise.rb', after: /  # config\.secret_key.*/ do
       <<-RUBY
         config.secret_key = ENV.fetch('DEVISE_SECRET_KEY')
       RUBY
@@ -98,14 +101,89 @@ if apply_devise?
   end
 end
 
-template 'config/initializers/ckeditor.rb.tt' if apply_ckeditor?
+after_bundle do
+  template 'config/initializers/ckeditor.rb.tt' if apply_ckeditor?
 
-create_initial_settings if apply_settings?
+  create_initial_settings if apply_settings?
+  create_initial_pundit if apply_pundit?
+  create_initial_mailkick if apply_mailkick?
+end
+
+aa_menu =
+  <<-RUBY
+
+    config.namespace :admin do |admin|
+      admin.build_menu :utility_navigation do |menu|
+        menu.add id: 'current_user',
+                 priority: 30,
+                 label: -> { display_name current_active_admin_user },
+                 url:   -> { admin_account_path(current_active_admin_user) },
+                 if:    :current_active_admin_user?
+        menu.add id: 'current_user_edit',
+                 label: -> { I18n.t('active_admin.account') },
+                 parent: 'current_user',
+                 priority: 10,
+                 url:   -> { admin_account_path(current_active_admin_user) },
+                 html_options: { class: 'left' }
+        admin.add_logout_button_to_menu menu
+      end
+    end
+  RUBY
+
+aa_routes =
+  <<-RUBY
+    devise_aa_config = ActiveAdmin::Devise.config
+    devise_aa_config[:singular] = :admin
+    devise_aa_config[:skip] = [:registrations, :unlocks, :confirmations]
+
+    devise_for :users, devise_aa_config
+
+  RUBY
+
+mounts = {}
+
+if apply_sidekiq?
+  mounts[:sidekiq] = <<-RUBY
+      require 'sidekiq/web'
+      mount Sidekiq::Web => '/jobs'
+  RUBY
+end
+
+if apply_ckeditor?
+  mounts[:ckeditor] = <<-RUBY
+      mount Ckeditor::Engine => '/ckeditor'
+  RUBY
+end
+
+if apply_pg_hero?
+  mounts[:pghero] = <<-RUBY
+      mount PgHero::Engine => '/pghero' if Rails.application.secrets.pghero
+  RUBY
+end
+
+aa_routes_new =
+  <<-RUBY
+  namespace :admin do
+    authenticate :admin, ->(u) { u.admin? } do
+      #{mounts[:ckeditor]}
+      #{mounts[:pghero]}
+      #{mounts[:sidekiq]}
+    end
+  end
+  RUBY
+
+aa_settings =
+  <<-RUBY
+
+    ActiveadminSettingsCached.configure do |config|
+      config.model_name = 'Setting'
+    end
+  RUBY
 
 if apply_aa?
-  create_initial_aa do
+  after_bundle do
+    create_initial_aa
 
-    copy_file 'config/initializers/formtastic.rb'
     copy_file 'config/initializers/formtastic.rb'
 
     insert_into_file 'config/initializers/active_admin.rb', before: /^ActiveAdmin.setup.*/ do
@@ -114,6 +192,7 @@ if apply_aa?
       require 'formtastic/inputs/select2_ajax_input'
       require 'formtastic/inputs/select2_multiple_ajax_input'
       require 'formtastic/inputs/color_picker_input'
+
       RUBY
     end
 
@@ -122,78 +201,44 @@ if apply_aa?
         <<-RUBY
         require 'active_admin/inputs/filters/select2_tags_ajax_input'
         require 'formtastic/inputs/select2_tags_ajax_input'
+
         RUBY
       end
     end
 
     if apply_settings?
       insert_into_file 'config/initializers/active_admin.rb', before: /^ActiveAdmin.setup.*/ do
-        <<-RUBY
-
-        ActiveadminSettingsCached.configure do |config|
-          config.model_name = 'Setting'
-        end
-        RUBY
+        aa_settings
       end
     end
 
-    insert_into_file 'config/initializers/active_admin.rb', after: /^ {2}# config.logout_link_method.*/ do
+    insert_into_file 'config/initializers/active_admin.rb', after: /^ {2}# config.logout_link_method.*\n/ do
       <<-RUBY
         config.logout_link_method = :delete
       RUBY
     end
-    insert_into_file 'config/initializers/active_admin.rb', after: /^ {2}# config.comments_menu.*/ do
+    insert_into_file 'config/initializers/active_admin.rb', after: /^ {2}# config.comments_menu.*\n/ do
       <<-RUBY
+
         config.comments_menu = :false
+
       RUBY
     end
-    insert_into_file 'config/initializers/active_admin.rb', after: /^ {2}# To disable\/customize.*/ do
+    insert_into_file 'config/initializers/active_admin.rb', before: /^end/ do
+      aa_menu
+    end
+    insert_into_file 'config/initializers/active_admin.rb', after: /^ {2}# To disable\/customize.*\n/ do
       <<-RUBY
         config.download_links = %i[csv json]
       RUBY
     end
 
     insert_into_file 'config/routes.rb', before: /^ {2}ActiveAdmin.routes.*/ do
-      <<-RUBY
-        devise_aa_config = ActiveAdmin::Devise.config
-        devise_aa_config[:singular] = :admin
-        devise_aa_config[:skip] = [:registrations, :unlocks, :confirmations]
-
-        devise_for :users, devise_aa_config
-      RUBY
+      aa_routes
     end
 
-    mounts = {}
-
-    if apply_sidekiq?
-      mounts[:sidekiq] = <<-RUBY
-      require 'sidekiq/web'
-      mount Sidekiq::Web => '/jobs'
-      RUBY
-    end
-
-    if apply_ckeditor?
-      mounts[:ckeditor] = <<-RUBY
-      mount Ckeditor::Engine => '/ckeditor'
-      RUBY
-    end
-
-    if apply_pg_hero?
-      mounts[:pghero] = <<-RUBY
-      mount PgHero::Engine => '/pghero' if Rails.application.secrets.pghero
-      RUBY
-    end
-
-    insert_into_file 'config/routes.rb', after: /^ {2}ActiveAdmin.routes\(self\)/ do
-      <<-RUBY
-        namespace :admin do
-          authenticate :admin, ->(u) { u.admin? } do
-            #{mounts[:ckeditor]}
-            #{mounts[:pghero]}
-            #{mounts[:sidekiq]}
-          end
-        end
-      RUBY
+    insert_into_file 'config/routes.rb', after: /^ {2}ActiveAdmin.routes\(self\).*\n/ do
+      aa_routes_new
     end
   end
 end

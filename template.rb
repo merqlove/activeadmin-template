@@ -334,72 +334,46 @@ def create_initial_migration
   run_with_clean_bundler_env 'bin/rake db:migrate'
 end
 
-def run_after_bundle(cmd)
-  after_bundle do
-    run_with_clean_bundler_env cmd
-    yield
-  end
-end
-
 def create_initial_whenever
-  run_after_bundle 'bin/bundle exec wheneverize .' do
-    yield
-  end
+  run 'bin/bundle exec wheneverize .'
 end
 
 def create_initial_aa
-  run_after_bundle 'bin/rails generate active_admin:install' do
-    yield
-  end
+  run 'bin/rails generate active_admin:install User'
 end
 
 def create_initial_devise
-  run_after_bundle 'bin/rails generate devise:install' do
-    run_with_clean_bundler_env 'bin/rails generate devise:install'
-    yield
-  end
+  run 'bundle exec spring stop'
+  run 'bin/rails generate devise:install'
+  run 'bin/rails generate devise User'
 end
 
 def create_initial_pundit
-  run_after_bundle 'bin/rails generate pundit:install' do
-    yield
-  end
+  run 'bin/rails generate pundit:install'
 end
 
 def create_initial_rspec
-  run_after_bundle 'bin/rails generate rspec:install' do
-    yield
-  end
+  run 'bin/rails generate rspec:install'
 end
 
 def create_initial_kaminari
-  run_after_bundle 'bin/rails generate kaminari:config' do
-    yield
-  end
+  run 'bin/rails generate kaminari:config'
 end
 
 def create_initial_settings
-  run_after_bundle 'bin/rails generate settings:install' do
-    yield
-  end
+  run 'bin/rails generate settings:install'
 end
 
 def create_initial_mailkick
-  run_after_bundle 'bin/rails generate mailkick:install' do
-    yield
-  end
+  run 'bin/rails generate mailkick:install'
 end
 
 def create_initial_formtastic
-  run_after_bundle 'bin/rails generate formtastic:install' do
-    yield
-  end
+  run 'bin/rails generate formtastic:install'
 end
 
 def create_initial_rollbar
-  run_after_bundle 'bin/rails generate rollbar:rollbar' do
-    yield
-  end
+  run 'bin/rails generate rollbar:rollbar'
 end
 
 apply_template!

@@ -16,6 +16,7 @@ module PunditHelper
 
 end
 
+<% if apply_api? -%>
 module PunditApiHelper
   extend ActiveSupport::Concern
 
@@ -41,4 +42,5 @@ module PunditApiHelper
   end
 
 end
+<% end -%>
 

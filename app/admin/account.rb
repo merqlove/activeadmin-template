@@ -3,7 +3,7 @@ ActiveAdmin.register User, as: 'Account' do
 
   config.breadcrumb = proc { [] }
 
-  permit_params :email, :password, :password_confirmation, :time_zone
+  permit_params :email, :password, :password_confirmation
 
   menu false
 
@@ -50,8 +50,6 @@ ActiveAdmin.register User, as: 'Account' do
   form do |f|
     f.inputs do
       f.input :email
-      f.input :time_zone, as: :select2,
-              collection: time_zone_options_for_select(f.object.time_zone.blank? ? 'UTC' : f.object.time_zone)
       f.input :password, required: false
       f.input :password_confirmation, required: false
     end
