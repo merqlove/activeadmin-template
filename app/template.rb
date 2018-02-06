@@ -2,9 +2,60 @@ apply "app/assets/javascripts/application.js.rb"
 copy_file "app/assets/stylesheets/application.scss"
 remove_file "app/assets/stylesheets/application.css"
 
+validations_user =
+  <<-RUBY
+  validates_presence_of   :email
+  validates_uniqueness_of :email, scope: :login, allow_blank: true, if: -> { email_changed? || login_changed? }
+  validates_format_of     :email, with: Devise.email_regexp, allow_blank: true
+
+  validates_format_of     :login, with: /\A[a-z0-9_\-]+\z/i, allow_blank: true, if: :login_changed?
+
+  RUBY
+
+enum_user =
+  <<-RUBY
+  enum role: {
+    user: 0,
+    manager: 1,
+    admin: 2
+  }
+
+  after_initialize :set_default_role, if: :new_record?
+
+  def role
+    return 'user' if read_attribute(:role).blank?
+    read_attribute(:role)
+  end
+
+  private
+
+  def set_default_role
+    self.role = :user if read_attribute(:role).blank?
+  end
+
+  RUBY
+
 clone_user =
   <<-RUBY
   include CloneAll
+
+  def cloning
+    user = deep_clone do |orig, kopy|
+      if kopy.is_a?(User)
+        kopy.is_clone = true
+        kopy.login = nil
+        kopy.email = "\#{UUID.generate(:compact)[0..6]}-\#{orig.email}"
+        kopy.password = "cloned-user"
+        kopy.tag_list = orig.tag_list
+        kopy.genre_list = orig.genre_list
+      end
+      if kopy.respond_to?(:copy_data_url=)
+        kopy.copy_data_url = orig if kopy.data_file_name
+      end
+    end
+    user.save!
+  end
+
   RUBY
 
 fid_user =
@@ -29,11 +80,21 @@ fid_user =
   def should_generate_new_friendly_id?
     login.blank?
   end
+
   RUBY
 
 if apply_devise?
   after_bundle do
     create_initial_devise
+
+    insert_into_file 'app/models/user.rb', after: /^class User.*\n/ do
+      validations_user
+    end
+
+    insert_into_file 'app/models/user.rb', after: /^class User.*\n/ do
+      enum_user
+    end
+
     if apply_fid?
       insert_into_file 'app/models/user.rb', after: /^class User.*\n/ do
         fid_user
@@ -102,6 +163,13 @@ after_bundle do
       api_base_controller
     end
   end
+
+  copy_file "app/policies/active_admin/comment_policy.rb"
+  copy_file "app/policies/active_admin/page_policy.rb"
+  copy_file "app/policies/ckeditor/attachment_file_policy.rb"
+  copy_file "app/policies/ckeditor/picture_policy.rb"
+  copy_file "app/services/application_service.rb"
+  copy_file "app/pipelines/welcome_index_pipeline.rb"
 end
 
 copy_file "app/models/concerns/clone_all.rb" if apply_clone?
@@ -148,6 +216,12 @@ if apply_aa?
   after_bundle do
     copy_file "app/admin/account.rb"
     copy_file "app/admin/user.rb.txt"
+  end
+
+  if apply_pundit?
+    after_bundle do
+      copy_file "app/admin/account.rb"
+    end
   end
 end
 

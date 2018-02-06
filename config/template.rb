@@ -18,25 +18,30 @@ if apply_capistrano?
   template 'config/deploy/staging.rb.tt'
 end
 
+base_routes =
+  <<-RUBY
+  mount LetterOpenerWeb::Engine, at: '/smtp' if Rails.env.development?
+
+  get "/robots.txt", :to => proc { |_|
+    [
+      200,
+      { "Content-Type" => "text/plain" },
+      ['User-agent: *\nDisallow: /']
+    ]
+  }
+
+  get 'unauthorized' => 'web/welcome#index'
+
+  scope module: :web do
+    get 'welcome' => 'welcome#index'
+  end
+
+  root 'web/welcome#index'
+  RUBY
+
 after_bundle do
   insert_into_file 'config/routes.rb', after: /^Rails.application.routes.*\n/ do
-    <<-RUBY
-    mount LetterOpenerWeb::Engine, at: '/smtp' if Rails.env.development?
-
-    get '/robots.txt', to: proc { |_| [
-      200,
-      { 'Content-Type' => 'text/plain' },
-      [ "User-agent: *\\nDisallow: /" ]
-    ]}
-
-    get 'unauthorized' => 'web/welcome#index'
-
-    scope module: :web do
-      get 'welcome' => 'welcome#index'
-    end
-
-    root 'web/welcome#index'
-    RUBY
+    base_routes
   end
 end
 
@@ -186,6 +191,21 @@ aa_settings =
   ActiveadminSettingsCached.configure do |config|
     config.model_name = 'Setting'
   end
+
+  RUBY
+
+aa_require =
+  <<-RUBY
+    require 'active_admin/inputs/filters/select2_multiple_ajax_input'
+    require 'formtastic/inputs/select2_ajax_input'
+    require 'formtastic/inputs/select2_multiple_ajax_input'
+    require 'formtastic/inputs/color_picker_input'
+  RUBY
+
+aa_require_tags =
+  <<-RUBY
+    require 'active_admin/inputs/filters/select2_tags_ajax_input'
+    require 'formtastic/inputs/select2_tags_ajax_input'
   RUBY
 
 if apply_aa?
@@ -198,22 +218,12 @@ if apply_aa?
     copy_file 'config/initializers/formtastic.rb'
 
     insert_into_file 'config/initializers/active_admin.rb', before: /^ActiveAdmin.setup.*/ do
-      <<-RUBY
-      require 'active_admin/inputs/filters/select2_multiple_ajax_input'
-      require 'formtastic/inputs/select2_ajax_input'
-      require 'formtastic/inputs/select2_multiple_ajax_input'
-      require 'formtastic/inputs/color_picker_input'
-
-      RUBY
+      aa_require
     end
 
     if apply_tags?
       insert_into_file 'config/initializers/active_admin.rb', before: /^ActiveAdmin.setup.*/ do
-        <<-RUBY
-        require 'active_admin/inputs/filters/select2_tags_ajax_input'
-        require 'formtastic/inputs/select2_tags_ajax_input'
-
-        RUBY
+        aa_require_tags
       end
     end
 
@@ -235,6 +245,18 @@ if apply_aa?
 
       RUBY
     end
+    gsub_file 'config/initializers/active_admin.rb',
+              /:authenticate_user!/,
+              ':authenticate_admin_user!'
+
+    gsub_file 'config/initializers/active_admin.rb',
+              /:current_user/,
+              ':current_admin'
+
+    gsub_file 'config/initializers/active_admin.rb',
+              /:destroy_user_session_path/,
+              ':destroy_admin_session_path'
+
     insert_into_file 'config/initializers/active_admin.rb', before: /^end/ do
       aa_menu
     end

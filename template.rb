@@ -23,7 +23,7 @@ def apply_template!
   template 'ruby-version.tt', '.ruby-version'
   copy_file 'simplecov', '.simplecov'
 
-  copy_file 'Capfile' if apply_capistrano?
+  template 'Capfile' if apply_capistrano?
   copy_file 'VERSION'
   copy_file 'Guardfile' if apply_guard?
   copy_file 'Procfile'
@@ -44,7 +44,17 @@ def apply_template!
   empty_directory '.git/safe'
 
   run_with_clean_bundler_env 'bin/setup'
-  create_initial_migration
+
+  if apply_db?
+    if apply_devise? || apply_aa?
+      after_bundle do
+        run_initial_reset
+      end
+    else
+      create_initial_migration
+    end
+  end
+
   generate_spring_binstubs
 
   binstubs = %w[
@@ -56,12 +66,14 @@ def apply_template!
   run_with_clean_bundler_env "bundle binstubs #{binstubs.join(' ')} --force"
 
   template 'rubocop.yml.tt', '.rubocop.yml'
-  run_rubocop_autocorrections
+  after_bundle do
+    run_rubocop_autocorrections
+  end
 
   unless any_local_git_commits?
     git :add => '-A .'
     git :commit => "-n -m 'Set up project'"
-    git :checkout => '-b development' if apply_capistrano?
+    git :checkout => '-b develop' if apply_capistrano?
     if git_repo_specified?
       git :remote => "add origin #{git_repo_url.shellescape}"
       git :push => '-u origin --all'
@@ -201,6 +213,10 @@ def apply_db?
   apply_way('apply_db','Use Db?', 'yes')
 end
 
+def apply_drop_db?
+  apply_way('apply_drop_db','Drop Db?', 'yes')
+end
+
 def apply_minitest?
   apply_way('apply_minitest','Use MiniTest (RSpec is default)?')
 end
@@ -328,10 +344,22 @@ def run_rubocop_autocorrections
   run_with_clean_bundler_env 'bin/rubocop -a --fail-level A > /dev/null'
 end
 
+def run_initial_reset
+  run_with_clean_bundler_env 'bin/rake db:drop db:create db:migrate db:seed'
+end
+
+def run_initial_migrate
+  run_with_clean_bundler_env 'bin/rake db:migrate'
+end
+
+def run_initial_seed
+  run_with_clean_bundler_env 'bin/rake db:seed'
+end
+
 def create_initial_migration
   return if Dir['db/migrate/**/*.rb'].any?
   run_with_clean_bundler_env 'bin/rails generate migration initial_migration'
-  run_with_clean_bundler_env 'bin/rake db:migrate'
+  run_initial_migrate
 end
 
 def create_initial_whenever
@@ -344,7 +372,7 @@ end
 
 def create_initial_devise
   run 'bundle exec spring stop'
-  run 'bin/rails generate model User login:string:index'
+  run 'bin/rails generate model User login:string:index role:integer:index'
   run 'bin/rails generate devise:install'
   run 'bin/rails generate devise User'
 end

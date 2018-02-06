@@ -10,7 +10,7 @@ This document covers the steps need to deploy the application to an existing env
 
 ### Environments
 
-* **staging** is deployed from the `development` branch.
+* **staging** is deployed from the `develop` branch.
 * **production** is deployed from the `master` branch.
 
 ### Prerequisites

@@ -27,7 +27,7 @@ end
 
 mailkick =
   <<-RUBY
-  
+
   # Cleanup routes
   initializer 'mailkick', :after => 'add_routing_paths' do |app|
     app.routes_reloader.paths.delete_if{ |path| path.include?('mailkick') }
@@ -56,6 +56,10 @@ insert_into_file "config/application.rb", :after => /Rails::Application\n/ do
     #{data[:mailkick]}
     #{data[:sidekiq]}
     #{data[:db]}
+
+    config.autoload_paths += %W(\#{config.root}/app/services)
+    config.autoload_paths += %W(\#{config.root}/app/jobs)
+    config.autoload_paths += %W(\#{config.root}/app/pipelines)
 
     # Set Time.zone default to the specified zone and make Active Record auto-convert to this zone.
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
