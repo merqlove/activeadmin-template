@@ -160,7 +160,7 @@ end
 
 def staging_hostname
   @staging_hostname ||=
-    ask_with_default('Staging hostname?', :blue, 'staging.example.com')
+    ask_with_default('Staging hostname?', :blue, "staging.#{@production_hostname}")
 end
 
 def gemfile_requirement(name)
@@ -194,11 +194,11 @@ def apply_bootstrap?
 end
 
 def apply_sidekiq?
-  apply_way('apply_sidekiq','Use Sidekiq?', 'yes')
+  apply_way('apply_sidekiq','Use Sidekiq?', 'no')
 end
 
 def apply_exceptions?
-  apply_way('apply_exceptions','Use Exceptions?', 'yes')
+  apply_way('apply_exceptions','Use Exceptions?', 'no')
 end
 
 def apply_be?
@@ -238,27 +238,27 @@ def apply_protection?
 end
 
 def apply_turbolinks?
-  apply_way('apply_turbolinks','Use Turbolinks?', 'yes')
+  apply_way('apply_turbolinks','Use Turbolinks?', 'no')
 end
 
 def apply_aa?
-  apply_way('apply_aa','Use ActiveAdmin?', 'yes')
+  apply_way('apply_aa','Use ActiveAdmin?', 'no')
 end
 
 def apply_aasm?
-  apply_way('apply_aasm','Use State Machines?', 'yes')
+  apply_way('apply_aasm','Use State Machines?', 'no')
 end
 
 def apply_draper?
-  apply_way('apply_draper','Use Draper?', 'yes')
+  apply_way('apply_draper','Use Draper?', 'no')
 end
 
 def apply_dry?
-  apply_way('apply_dry','Use DryRb?', 'yes')
+  apply_way('apply_dry','Use DryRb?', 'no')
 end
 
 def apply_clone?
-  apply_way('apply_clone','Use Db Object cloning?', 'yes')
+  apply_way('apply_clone','Use Db Object cloning?', 'no')
 end
 
 def apply_templates?
@@ -266,15 +266,15 @@ def apply_templates?
 end
 
 def apply_upload?
-  apply_way('apply_upload','Use Uploads?', 'yes')
+  apply_way('apply_upload','Use Uploads?', 'no')
 end
 
 def apply_fid?
-  apply_way('apply_fid','Use FriendlyId?', 'yes')
+  apply_way('apply_fid','Use FriendlyId?', 'no')
 end
 
 def apply_settings?
-  apply_way('apply_settings','Use RailsSettingsCached?', 'yes')
+  apply_way('apply_settings','Use RailsSettingsCached?', 'no')
 end
 
 def apply_profiler?
@@ -286,7 +286,7 @@ def apply_api?
 end
 
 def apply_trees?
-  apply_way('apply_trees','Use Trees?', 'yes')
+  apply_way('apply_trees','Use Trees?', 'no')
 end
 
 def apply_followers?

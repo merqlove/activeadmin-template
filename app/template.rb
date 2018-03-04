@@ -164,10 +164,16 @@ after_bundle do
     end
   end
 
-  copy_file "app/policies/active_admin/comment_policy.rb"
-  copy_file "app/policies/active_admin/page_policy.rb"
-  copy_file "app/policies/ckeditor/attachment_file_policy.rb"
-  copy_file "app/policies/ckeditor/picture_policy.rb"
+  if apply_aa? && apply_pundit?
+    copy_file "app/policies/active_admin/comment_policy.rb"
+    copy_file "app/policies/active_admin/page_policy.rb"
+  end
+
+  if apply_ckeditor? && apply_pundit?
+    copy_file "app/policies/ckeditor/attachment_file_policy.rb"
+    copy_file "app/policies/ckeditor/picture_policy.rb"
+  end
+
   copy_file "app/services/application_service.rb"
   copy_file "app/pipelines/welcome_index_pipeline.rb"
 end
