@@ -83,7 +83,13 @@ fid_user =
 
   RUBY
 
-if apply_devise?
+if apply_spree?
+  after_bundle do
+    create_initial_spree
+  end
+end
+
+if apply_devise? && !apply_spree?
   after_bundle do
     create_initial_devise
 

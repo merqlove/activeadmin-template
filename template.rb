@@ -305,6 +305,10 @@ def apply_devise?
   apply_way('apply_devise','Use Devise?', 'yes')
 end
 
+def apply_spree?
+  apply_way('apply_spree','Use Spree?', 'no')
+end
+
 def apply_pundit?
   apply_way('apply_pundit','Use Pundit?', 'yes')
 end
@@ -367,42 +371,50 @@ def create_initial_whenever
 end
 
 def create_initial_aa
-  run 'bin/rails generate active_admin:install User'
+  run 'bin/rails g active_admin:install User'
+end
+
+def create_initial_spree
+  run 'bundle exec spring stop'
+  run 'bin/bundle update i18n'
+  run 'bin/rails g spree:install --user_class=Spree::User'
+  run 'bin/rails g spree:auth:install'
+  run 'bin/rails g spree_gateway:install'
 end
 
 def create_initial_devise
   run 'bundle exec spring stop'
-  run 'bin/rails generate model User login:string:index role:integer:index'
-  run 'bin/rails generate devise:install'
-  run 'bin/rails generate devise User'
+  run 'bin/rails g model User login:string:index role:integer:index'
+  run 'bin/rails g devise:install'
+  run 'bin/rails g devise User'
 end
 
 def create_initial_pundit
-  run 'bin/rails generate pundit:install'
+  run 'bin/rails g pundit:install'
 end
 
 def create_initial_rspec
-  run 'bin/rails generate rspec:install'
+  run 'bin/rails g rspec:install'
 end
 
 def create_initial_kaminari
-  run 'bin/rails generate kaminari:config'
+  run 'bin/rails g kaminari:config'
 end
 
 def create_initial_settings
-  run 'bin/rails generate settings:install'
+  run 'bin/rails g settings:install'
 end
 
 def create_initial_mailkick
-  run 'bin/rails generate mailkick:install'
+  run 'bin/rails g mailkick:install'
 end
 
 def create_initial_formtastic
-  run 'bin/rails generate formtastic:install'
+  run 'bin/rails g formtastic:install'
 end
 
 def create_initial_rollbar
-  run 'bin/rails generate rollbar:rollbar'
+  run 'bin/rails g rollbar:rollbar'
 end
 
 apply_template!

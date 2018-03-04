@@ -97,7 +97,11 @@ if apply_devise?
       config.secret_key = ENV.fetch('DEVISE_SECRET_KEY')
       RUBY
     end
+  end
+end
 
+if apply_devise? && !apply_spree?
+  after_bundle do
     gsub_file 'config/initializers/devise.rb', /  config.case_insensitive_keys = \[:email\]/ do
       "  # config.case_insensitive_keys = [:email]
          config.case_insensitive_keys = [:email, :login]"
