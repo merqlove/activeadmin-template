@@ -190,11 +190,17 @@ gem 'select2-rails'
 # Assets
 gem "autoprefixer-rails", ">= 5.0.0.1"
 
+<% if apply_spree? -%>
+gem 'sprockets', '~> 3.0'
+gem 'sass-rails', '~> 5.0.7'
+<% else %>
 gem 'sprockets', '~> 4.0.0.beta6'
+gem 'sass-rails', git: 'https://github.com/rails/sass-rails.git' # For Sprockets 4
+<% end -%>
+
 gem 'sprockets-rails', '~> 3.2.1'
 
 gem "coffee-rails"<%= gemfile_requirement("coffee-rails") %>
-gem 'sass-rails', git: 'https://github.com/rails/sass-rails.git' # For Sprockets 4
 gem 'uglifier'
 
 <% if apply_ckeditor? -%>

@@ -238,7 +238,7 @@ def apply_protection?
 end
 
 def apply_turbolinks?
-  apply_way('apply_turbolinks','Use Turbolinks?', 'no')
+  apply_way('apply_turbolinks','Use Turbolinks?', 'yes')
 end
 
 def apply_aa?
