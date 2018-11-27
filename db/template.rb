@@ -4,6 +4,6 @@ if apply_aa?
   after_bundle do
     gsub_file 'db/seeds.rb',
               /User\.create!\(\:email/,
-              'User.create!(:role => 2, :login => "admin", :email'
+              'User.create!(role: 2, login: "admin", :email'
   end
 end

@@ -1,8 +1,8 @@
 require 'fileutils'
 
 server "<%= production_hostname %>",
-       :user => "deploy",
-       :roles => %w(app backup cron db redis sidekiq web)
+       user: "deploy",
+       roles: %w(app backup cron db redis sidekiq web)
 
 set :branch do
   v = File.readlines('../../VERSION').to_a

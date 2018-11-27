@@ -2,13 +2,13 @@
 
 ## Description
 
-This is the application template that I use for my Rails 5.1 projects. As a freelance Rails developer, I need to be able to start new projects quickly and with a good set of defaults. I've assembled this template over the years to include best-practices, tweaks, documentation, and personal preferences, while still generally adhering to the "Rails way".
+This is the application template that I use for my Rails 5.2 projects. As a freelance Rails developer, I need to be able to start new projects quickly and with a good set of defaults. I've assembled this template over the years to include best-practices, tweaks, documentation, and personal preferences, while still generally adhering to the "Rails way".
 
 ## Requirements
 
 This template currently works with:
 
-* Rails 5.1.x
+* Rails 5.2.x
 * PostgreSQL
 * chromedriver
 * ActiveAdmin
@@ -143,7 +143,6 @@ Rails generators are very lightly documented; what you’ll find is that most of
 [postmark-rails]:http://www.rubydoc.info/gems/postmark-rails/0.12.0
 [brakeman]:https://github.com/presidentbeef/brakeman
 [bundler-audit]:https://github.com/rubysec/bundler-audit
-[secure_headers]:https://github.com/twitter/secureheaders
 [mocha]:https://github.com/freerange/mocha
 [shoulda]:https://github.com/thoughtbot/shoulda
 [simplecov]:https://github.com/colszowka/simplecov

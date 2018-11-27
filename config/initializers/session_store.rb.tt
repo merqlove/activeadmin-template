@@ -12,5 +12,5 @@ Rails.application.config.session_store :redis_store, {
     }
   ],
   key: '_<%= app_name %>_session',
-  expires_in: 1.day#, :domain => :all
+  expires_in: 1.day#, domain: :all
 }

@@ -15,7 +15,7 @@ pg_hero =
 
 data[:pg_hero] = pg_hero if apply_pg_hero?
 
-insert_into_file "config/application.rb", :after => /^Bundler.require.*/ do
+insert_into_file "config/application.rb", after: /^Bundler.require.*/ do
   <<-RUBY
   #{data[:pg_hero]}
 
@@ -29,7 +29,7 @@ mailkick =
   <<-RUBY
 
   # Cleanup routes
-  initializer 'mailkick', :after => 'add_routing_paths' do |app|
+  initializer 'mailkick', after: 'add_routing_paths' do |app|
     app.routes_reloader.paths.delete_if{ |path| path.include?('mailkick') }
   end
   RUBY
@@ -51,7 +51,7 @@ data[:mailkick] = mailkick if apply_mailkick?
 data[:sidekiq] = sidekiq if apply_sidekiq?
 data[:db] = db if apply_db?
 
-insert_into_file "config/application.rb", :after => /Rails::Application\n/ do
+insert_into_file "config/application.rb", after: /Rails::Application\n/ do
   <<-RUBY
     #{data[:mailkick]}
     #{data[:sidekiq]}

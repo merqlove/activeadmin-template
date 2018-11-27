@@ -8,17 +8,17 @@
     <%%# CSS should go closest to the top of the document as possible. %>
     <% if apply_turbolinks? -%>
     <%%= stylesheet_link_tag("application",
-                            :media => "all",
-                            "data-turbolinks-track" => true) %>
+                            media: "all",
+                            "data-turbolinks-track" => "reload") %>
     <% else %>
     <%%= stylesheet_link_tag("application",
-                            :media => "all") %>
+                            media: "all") %>
     <% end -%>
 
     <%%# JavaScript must be in head for Turbolinks to work. %>
     <% if apply_turbolinks? -%>
     <%%= javascript_include_async_tag("application",
-                                     "data-turbolinks-track" => true) %>
+                                     "data-turbolinks-track" => "reload") %>
     <% else %>
     <%%= javascript_include_async_tag("application") %>
     <% end -%>
@@ -31,6 +31,7 @@
     <meta name="apple-mobile-web-app-title" content="<%= app_const_base.titleize %>">
 
     <%%= csrf_meta_tags %>
+    <%%= csp_meta_tag %>
 
     <title>
       <%%= strip_tags(yield(:title)) + " – " if content_for?(:title) %>

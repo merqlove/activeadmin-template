@@ -5,7 +5,7 @@ module Formtastic
       def extra_input_html_options
         {
           class: 'autocomplete-select2',
-          :multiple => true,
+          multiple: true,
           data: {
             placeholder: options[:placeholder],
             tags: true,

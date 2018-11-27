@@ -5,7 +5,7 @@ if ENV['WEBDRIVER'] == 'selenium'
   require 'selenium-webdriver'
   Capybara.default_driver = :selenium
   Capybara.register_driver :selenium do |app|
-    Capybara::Selenium::Driver.new(app, :browser => :chrome)
+    Capybara::Selenium::Driver.new(app, browser: :chrome)
   end
 else
   require 'capybara/poltergeist'
@@ -30,7 +30,7 @@ end
 RSpec.configure do |config|
   if ENV['WEBDRIVER'] == 'selenium'
     config.before(:each, type: :feature) do
-      WebMock.disable_net_connect!(:allow_localhost => true)
+      WebMock.disable_net_connect!(allow_localhost: true)
     end
   end
 end

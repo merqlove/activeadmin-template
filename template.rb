@@ -1,4 +1,4 @@
-RAILS_REQUIREMENT = '~> 5.1.0'.freeze
+RAILS_REQUIREMENT = '~> 5.2.0'.freeze
 
 def apply_template!
   assert_minimum_rails_version
@@ -6,21 +6,22 @@ def apply_template!
   assert_postgresql
   add_template_repository_to_source_path
 
-  template 'Gemfile.tt', :force => true
+  template 'Gemfile.tt', force: true
 
   if apply_capistrano?
     template 'DEPLOYMENT.md.tt'
     template 'PROVISIONING.md.tt'
   end
 
-  template 'README.md.tt', :force => true
+  template 'README.md.tt', force: true
   remove_file 'README.rdoc'
 
   template 'example.env.tt'
   template 'example.env.tt', '.env'
-  copy_file 'gitignore', '.gitignore', :force => true
+  copy_file "editorconfig", ".editorconfig"
+  copy_file 'gitignore', '.gitignore', force: true
   copy_file 'overcommit.yml', '.overcommit.yml'
-  template 'ruby-version.tt', '.ruby-version'
+  template 'ruby-version.tt', '.ruby-version', force: true
   copy_file 'simplecov', '.simplecov'
 
   template 'Capfile' if apply_capistrano?
@@ -28,6 +29,8 @@ def apply_template!
   copy_file 'Guardfile' if apply_guard?
   copy_file 'Procfile'
 
+  apply 'Rakefile.rb'
+  apply 'config.ru.rb'
   apply 'app/template.rb'
   apply 'bin/template.rb'
   apply 'circleci/template.rb'
@@ -71,12 +74,12 @@ def apply_template!
   end
 
   unless any_local_git_commits?
-    git :add => '-A .'
-    git :commit => "-n -m 'Set up project'"
-    git :checkout => '-b develop' if apply_capistrano?
+    git add: '-A .'
+    git commit: "-n -m 'Set up project'"
+    git checkout: '-b develop' if apply_capistrano?
     if git_repo_specified?
-      git :remote => "add origin #{git_repo_url.shellescape}"
-      git :push => '-u origin --all'
+      git remote: "add origin #{git_repo_url.shellescape}"
+      git push: '-u origin --all'
     end
   end
 end
@@ -93,14 +96,14 @@ def add_template_repository_to_source_path
     require 'tmpdir'
     source_paths.unshift(tempdir = Dir.mktmpdir('rails-template-'))
     at_exit { FileUtils.remove_entry(tempdir) }
-    git :clone => [
+    git clone: [
       '--quiet',
       'https://github.com/merqlove/rails-template.git',
       tempdir
     ].map(&:shellescape).join(' ')
 
     if (branch = __FILE__[%r{rails-template/(.+)/template.rb}, 1])
-      Dir.chdir(tempdir) { git :checkout => branch }
+      Dir.chdir(tempdir) { git checkout: branch }
     end
   else
     source_paths.unshift(File.dirname(__FILE__))
@@ -120,11 +123,11 @@ end
 # Bail out if user has passed in contradictory generator options.
 def assert_valid_options
   valid_options = {
-    :skip_gemfile => false,
-    :skip_bundle => false,
-    :skip_git => false,
-    :skip_test_unit => false,
-    :edge => false
+    skip_gemfile: false,
+    skip_bundle: false,
+    skip_git: false,
+    skip_test_unit: false,
+    edge: false
   }
   valid_options.each do |key, expected|
     next unless options.key?(key)
@@ -340,12 +343,19 @@ def apply_way(_var, _text, default = 'no')
 end
 
 def run_with_clean_bundler_env(cmd)
-  return run(cmd) unless defined?(Bundler)
-  Bundler.with_clean_env { run(cmd) }
+  success = if defined?(Bundler)
+              Bundler.with_clean_env { run(cmd) }
+            else
+              run(cmd)
+            end
+  unless success
+    puts "Command failed, exiting: #{cmd}"
+    exit(1)
+  end
 end
 
 def run_rubocop_autocorrections
-  run_with_clean_bundler_env 'bin/rubocop -a --fail-level A > /dev/null'
+  run_with_clean_bundler_env "bin/rubocop -a --fail-level A > /dev/null || true"
 end
 
 def run_initial_reset

@@ -6,8 +6,8 @@ class CreateAttachments < ActiveRecord::Migration[5.1]
       t.integer :data_file_size
 
       t.integer :parent_id
-      t.string  :parent_type, :limit => 30
-      t.string  :type, :limit => 30
+      t.string  :parent_type, limit: 30
+      t.string  :type, limit: 30
 
       # Uncomment	it to save images dimensions, if your need it
       t.integer :width

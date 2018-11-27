@@ -13,7 +13,7 @@ namespace :deploy do
     task :update do
       set_up_prompts
 
-      on release_roles(:all), :in => :sequence do
+      on release_roles(:all), in: :sequence do
         existing_env = if test("[ -f #{shared_dotenv_path} ]")
                          download!(shared_dotenv_path)
                        end
@@ -28,7 +28,7 @@ namespace :deploy do
     def set_up_prompts
       fetch(:dotenv_keys).each do |key|
         if key.to_s =~ /key|token|secret|password|pepper/i
-          ask(key, nil, :echo => false)
+          ask(key, nil, echo: false)
         else
           ask(key, nil)
         end
@@ -45,7 +45,7 @@ namespace :deploy do
       end
 
       unless existing == updated
-        put(updated, shared_dotenv_path, :mode => '600')
+        put(updated, shared_dotenv_path, mode: '600')
       end
     end
   end

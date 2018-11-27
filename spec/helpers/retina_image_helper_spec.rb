@@ -1,10 +1,10 @@
 require 'rails_helper'
 
-RSpec.describe RetinaImageHelper, :type => :helper do
+RSpec.describe RetinaImageHelper, type: :helper do
   include RetinaImageHelper
 
   it 'retina_image_tag' do
-    tag = retina_image_tag('example.png', :alt => 'example')
+    tag = retina_image_tag('example.png', alt: 'example')
 
     expect(tag).to match(%r{\A<img srcset=".*" alt=".*" src=".*" />\z})
     expect(tag).to match(/alt="example"/)

@@ -1,13 +1,10 @@
 source "https://rubygems.org"
 
-git_source(:github) do |repo_name|
-  repo_name = "#{repo_name}/#{repo_name}" unless repo_name.include?("/")
-  "https://github.com/#{repo_name}.git"
-end
+git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
 gem 'i18n-timezones'
 # gem 'rails', git: 'https://github.com/rails/rails.git', branch: '5-1-stable'
-gem "rails", "<%= Rails.version %>"
+gem "rails", "~> <%= Rails.version %>"
 
 gem "puma"<%= gemfile_requirement("puma") %>
 
@@ -15,7 +12,7 @@ gem "active_type", ">= 0.3.2"
 <% unless apply_devise? -%>
 gem "bcrypt"<%= gemfile_requirement("bcrypt") %>
 <% end -%>
-gem "bootsnap", ">= 1.1.0", :require => false
+gem "bootsnap", ">= 1.2.0", require: false
 gem 'dotenv-rails'
 gem 'foreman', require: false
 gem 'hashie'
@@ -24,7 +21,7 @@ gem 'uuid'
 
 <% if apply_db? -%>
 # DB
-gem "pg"<%= gemfile_requirement("pg") || ', "~> 1.0"' %>
+gem "pg"<%= gemfile_requirement("pg") %>
 gem "pgcli-rails"
 
 <% if apply_pg_hero? -%>
@@ -44,9 +41,12 @@ gem 'whenever', require: false
 <% end -%>
 
 <% if apply_spree? -%>
+# Spree
 gem 'spree', '~> 3.4.4'
 gem 'spree_auth_devise', '~> 3.3'
 gem 'spree_gateway', '~> 3.3'
+gem 'spree_i18n', github: 'spree-contrib/spree_i18n'
+gem 'spree_globalize', github: 'spree-contrib/spree_globalize', branch: 'master'
 <% end -%>
 
 <% if apply_devise? -%>
@@ -116,7 +116,6 @@ gem 'rack-attack'
 gem 'rack-cors'
 gem 'rack-protection'
 
-gem "secure_headers", "~> 3.0"
 <% end -%>
 
 <% if apply_turbolinks? -%>
@@ -226,33 +225,39 @@ group :development do
   gem "better_errors"
   gem "binding_of_caller"
 <% end -%>
-  gem "brakeman", :require => false
-  gem "bundler-audit", ">= 0.5.0", :require => false
-  gem 'license_finder', :require => false
+  gem "brakeman", require: false
+  gem "bundler-audit", ">= 0.5.0", require: false
+  gem 'license_finder', require: false
 <% if apply_capistrano? -%>
-  gem "capistrano", "~> 3.10", :require => false
-  gem "capistrano-bundler", "~> 1.3", :require => false
-  gem "capistrano-rails", :require => false
-  gem 'capistrano3-puma', :require => false
+  gem "capistrano", "~> 3.10", require: false
+  gem "capistrano-bundler", "~> 1.3", require: false
+  gem "capistrano-rails", require: false
+  gem 'capistrano3-puma', require: false
 <% end -%>
 
 <% if apply_guard? -%>
-  gem "guard", ">= 2.2.2", :require => false
-  gem "guard-livereload", :require => false
-  gem "guard-minitest", :require => false
+  gem "guard", ">= 2.2.2", require: false
+  gem "guard-livereload", require: false
+  gem "guard-minitest", require: false
   gem "rack-livereload"
 <% end -%>
 
   gem "letter_opener_web"
-  gem "overcommit", ">= 0.37.0", :require => false
+  gem "overcommit", ">= 0.37.0", require: false
 
 <% if apply_crypto? -%>
-  gem "bcrypt_pbkdf", :require => false
-  gem "rbnacl", "~> 3.4", :require => false
-  gem "rbnacl-libsodium", :require => false
+  <% if apply_capistrano? -%>
+    gem "bcrypt_pbkdf", require: false
+  <% end -%>
+  gem "ed25519", "~> 1.2", require: false
+  gem "rbnacl", "~> 3.4", require: false
+  gem "rbnacl-libsodium", require: false
 <% end -%>
 
   gem "listen"<%= gemfile_requirement("listen") %>
+  <% if apply_capistrano? -%>
+    gem "net-ssh", ">= 5.0.0", require: false
+  <% end -%>
 
 <% unless apply_be? -%>
   # Access an IRB console on exception pages or by using `console` anywhere in the code.
@@ -271,11 +276,11 @@ group :development do
   gem 'rspec_junit_formatter'
 <% end -%>
 
-  gem "rubocop", ">= 0.50.0", :require => false
-  gem "simplecov", :require => false
-  gem "sshkit", "~> 1.8", :require => false
-  # gem "terminal-notifier", :require => false
-  # gem "terminal-notifier-guard", :require => false
+  gem "rubocop", ">= 0.58.0", require: false
+  gem "simplecov", require: false
+  gem "sshkit", "~> 1.16", require: false
+  # gem "terminal-notifier", require: false
+  # gem "terminal-notifier-guard", require: false
   # gem "xray-rails", ">= 0.1.18"
 end
 
@@ -296,8 +301,8 @@ group :test do
   gem "launchy"
 
 <% if apply_minitest? -%>
-  gem "minitest-ci", ">= 3.3.0", :require => false
-  gem "mocha"
+  gem "minitest-ci", ">= 3.3.0", require: false
+  gem "mocha", ">= 1.4.0"
   gem "shoulda-context"
 <% end -%>
 

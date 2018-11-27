@@ -9,6 +9,8 @@ AllCops:
     - config/environment.rb
     - config/initializers/version.rb
     - db/schema.rb
+    - "node_modules/**/*"
+    - "bower_components/**/*"
     - "tmp/**/*"
     - "vendor/**/*"
     - Gemfile
@@ -42,6 +44,9 @@ Metrics/MethodLength:
     - "db/migrate/*"
     - "test/**/*"
 
+Naming/MemoizedInstanceVariableName:
+  EnforcedStyleForLeadingUnderscores: optional
+
 Naming/VariableNumber:
   Enabled: false
 
@@ -55,6 +60,9 @@ Rails/ApplicationRecord:
   Exclude:
     - "db/migrate/**"
 
+Rails/RefuteMethods:
+  Enabled: false
+
 Rails/Validation:
   Enabled: false
 
@@ -65,14 +73,7 @@ Style/ClassAndModuleChildren:
   Enabled: false
 
 Style/Documentation:
-  Exclude:
-    - "app/controllers/application_controller.rb"
-    - "app/helpers/**/*_helper.rb"
-    - "app/mailers/**/*_mailer.rb"
-    - "app/models/application_record.rb"
-    - "config/**/*"
-    - "db/**/*"
-    - "test/**/*"
+  Enabled: false
 
 Style/DoubleNegation:
   Enabled: false

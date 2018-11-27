@@ -12,7 +12,7 @@ guard :livereload do
   watch(%r{(app|vendor)(/assets/\w+/(.+)\.(scss))}) { |m| "/assets/#{m[3]}.css" }
 end
 
-guard :rspec, :spring => "bin/rails spec
+guard :rspec, spring: "bin/rails spec
 " do
   watch(%r{^app/(.+)\.rb$})                               { |m| "test/#{m[1]}_test.rb" }
   watch(%r{^app/controllers/application_controller\.rb$}) { "test/controllers" }

@@ -11,7 +11,7 @@ jobs:
           PGHOST: 127.0.0.1
           PGUSER: postgres
           RAILS_ENV: test
-      - image: circleci/postgres:10
+      - image: circleci/postgres:10.5-alpine
         environment:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: ""
@@ -24,9 +24,9 @@ jobs:
       # Download and cache dependencies
       - restore_cache:
           keys:
-          - v1-dependencies-{{ arch }}-{{ checksum "Gemfile.lock" }}
-          # fallback to using the latest cache if no exact match is found
-          - v1-dependencies-{{ arch }}-
+            - v1-dependencies-{{ arch }}-{{ checksum "Gemfile.lock" }}
+            # fallback to using the latest cache if no exact match is found
+            - v1-dependencies-{{ arch }}-
 
       - run:
           name: Install dependencies
@@ -50,7 +50,7 @@ jobs:
       - run:
           name: Run security audits
           command: |
-            bundle exec brakeman --exit-on-warn --no-progress
+            bundle exec brakeman -q --no-summary
             bundle exec bundle-audit check --update -v
 
       - run:
@@ -85,7 +85,3 @@ jobs:
       - store_artifacts:
           path: ./tmp/screenshots
           destination: screenshots
-
-      - store_artifacts:
-          path: brakeman-output.html
-          destination: brakeman-output.html

@@ -21,7 +21,7 @@ Rails.application.config.middleware.insert_before 0, Rack::Cors do
              headers: :any,
              methods: %i[get post patch delete put options head],
              credentials: true,
-             # :max_age => 0,
+             # max_age: 0,
              expose: %w[access-token expiry token-type uid client Etag Server X-Content-Type-Options
                         X-Frame-Options X-Request-Id X-Runtime X-CSRF-Token X-CSRF-TOKEN X-XSRF-Token
                         if-modified-since

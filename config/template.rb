@@ -1,10 +1,8 @@
 apply 'config/application.rb'
-apply 'config/boot.rb'
-copy_file 'config/brakeman.yml'
 template 'config/database.example.yml.tt'
-template 'config/database.example.yml.tt', 'config/database.yml', :force => true
-copy_file 'config/puma.rb', :force => true
-copy_file 'config/secrets.yml', :force => true
+template 'config/database.example.yml.tt', 'config/database.yml', force: true
+copy_file 'config/puma.rb', force: true
+copy_file 'config/secrets.yml', force: true
 
 copy_file 'config/sidekiq.yml' if apply_sidekiq?
 
@@ -22,7 +20,7 @@ base_routes =
   <<-RUBY
   mount LetterOpenerWeb::Engine, at: '/smtp' if Rails.env.development?
 
-  get "/robots.txt", :to => proc { |_|
+  get "/robots.txt", to: proc { |_|
     [
       200,
       { "Content-Type" => "text/plain" },
@@ -54,7 +52,6 @@ template 'config/initializers/rollbar.rb.tt' if apply_rollbar?
 copy_file 'config/initializers/profiler.rb' if apply_profiler?
 copy_file 'config/initializers/rotate_log.rb'
 copy_file 'config/initializers/carrier_wave.rb' if apply_upload?
-copy_file 'config/initializers/secure_headers.rb' if apply_protection?
 copy_file 'config/initializers/version.rb'
 
 after_bundle do
@@ -159,7 +156,7 @@ if apply_sidekiq?
   mounts[:sidekiq] =
   <<-RUBY
   require 'sidekiq/web'
-  mount Sidekiq::Web => '/jobs'
+  mount Sidekiq:Web: '/jobs'
 
   RUBY
 end
@@ -167,14 +164,14 @@ end
 if apply_ckeditor?
   mounts[:ckeditor] =
   <<-RUBY
-  mount Ckeditor::Engine => '/ckeditor'
+  mount Ckeditor:Engine: '/ckeditor'
   RUBY
 end
 
 if apply_pg_hero?
   mounts[:pghero] =
   <<-RUBY
-  mount PgHero::Engine => '/pghero' if Rails.application.secrets.pghero
+  mount PgHero:Engine: '/pghero' if Rails.application.secrets.pghero
   RUBY
 end
 

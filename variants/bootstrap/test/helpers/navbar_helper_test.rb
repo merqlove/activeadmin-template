@@ -4,13 +4,13 @@ class NavbarHelperTest < ActionView::TestCase
   include NavbarHelper
 
   test "#navbar_link_to adds active class according to :active_when" do
-    stubs(:params).returns(:controller => "users")
+    stubs(:params).returns(controller: "users")
 
     tag = navbar_link_to(
       "Test",
       "http://example.com",
-      :title => "foo",
-      :active_when => { :controller => "users" }
+      title: "foo",
+      active_when: { controller: "users" }
     )
 
     assert_equal(
@@ -22,12 +22,12 @@ class NavbarHelperTest < ActionView::TestCase
   end
 
   test "#navbar_link_to honors regular expressions" do
-    stubs(:params).returns(:controller => "users")
+    stubs(:params).returns(controller: "users")
 
     tag = navbar_link_to(
       "Test",
       "http://example.com",
-      :active_when => { :controller => /^user.*/ }
+      active_when: { controller: /^user.*/ }
     )
 
     assert_equal(
@@ -37,8 +37,8 @@ class NavbarHelperTest < ActionView::TestCase
   end
 
   test "#navbar_link_to otherwise doesn't add active class" do
-    stubs(:params).returns(:controller => "users")
-    tag = navbar_link_to("Welcome", "/", :active_when => { :controller => "web/welcome" })
+    stubs(:params).returns(controller: "users")
+    tag = navbar_link_to("Welcome", "/", active_when: { controller: "web/welcome" })
     assert_equal('<li><a href="/">Welcome</a></li>', tag)
   end
 end
